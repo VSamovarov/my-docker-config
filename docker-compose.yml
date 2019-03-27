@@ -1,0 +1,38 @@
+version: '3.1'
+services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - 80:80
+    volumes:
+      - ./src:/var/www/html
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - php
+
+  php:
+    build:
+      context: ./
+      dockerfile: phpfrm.docker
+    restart: always
+    depends_on:
+      - db
+    volumes:
+      - ./src:/var/www/html:rw,cached
+
+  db:
+    image: mariadb
+    restart: always
+    volumes:
+      - /wpdbdata:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: vsam
+      MYSQL_USER: samovarov
+      MYSQL_PASSWORD: victor
+      MYSQL_ROOT_PASSWORD: 12345
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 9999:8080
